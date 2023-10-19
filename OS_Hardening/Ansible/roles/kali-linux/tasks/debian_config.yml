@@ -1,0 +1,13 @@
+---
+
+- name: Add Kali Repo Key (Debian)
+  apt_key: keyserver=pgp.mit.edu id=ED444FF07D8D0BF6
+  when: ansible_os_family == "Debian"
+
+- name: Add Kali Main Repo (Debian)
+  apt_repository: repo="deb http://http.kali.org/kali kali-rolling main contrib non-free" state=present
+  when: ansible_os_family == "Debian"
+
+- name: Add Kali Unstable Repo (Debian)
+  apt_repository: repo="deb http://repo.kali.org/kali kali-bleeding-edge main" state=present
+  when: ansible_os_family == "Debian"

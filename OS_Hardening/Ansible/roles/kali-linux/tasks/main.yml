@@ -1,0 +1,9 @@
+---
+
+# Installs Kali package groups on Debian based systems 
+
+- include: debian_config.yml
+  when: ansible_os_family == "Debian" or ansible_os_family | match("Kali.*")
+
+- include: debian_install.yml
+  when: ansible_os_family == "Debian" or ansible_os_family | match("Kali.*")

@@ -1,0 +1,21 @@
+---
+
+- name: Update Cache
+  apt: update_cache=yes force=yes
+
+- name: Force Dist Upgrade
+  apt: upgrade=dist force=yes
+
+- name: Install Kali Tools
+  ignore_errors: yes
+  apt: name={{ item }} state=present update_cache=yes install_recommends=yes force=yes 
+  with_items:
+    - kali-defaults
+    - kali-linux
+    - kali-desktop-common
+    - kali-linux-forensic
+    - kali-linux-pwtools
+    - kali-linux-web
+
+- name: Clean up
+  command: apt clean
