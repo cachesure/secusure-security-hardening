@@ -1,0 +1,14 @@
+---
+
+- name: Install OSSEC Server
+  package: 
+    name: ossec-hids-server 
+    state: present
+  when: ossec.server_type == "master"
+
+- name: Install OSSEC Agent
+  package: 
+    name: ossec-hids-agent 
+    state: present
+  ignore_errors: yes
+  when: ossec.server_type == "agent"

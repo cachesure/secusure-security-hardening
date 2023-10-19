@@ -1,0 +1,61 @@
+---
+
+- name: Set OSSEC Root directory permissions 
+  file: 
+    path: /var/ossec-server 
+    owner: root 
+    group: ossec 
+    mode: 0550 
+    recurse: no
+
+- name: Set File & Directory Permissions
+  file: 
+    path: /var/ossec-server/{{ item.name }} 
+    mode: {{ item.mode }} 
+    owner: {{ item.owner }} 
+    group: {{ item.group }} 
+    recurse: {{ item.recurse }} 
+    state: {{ item.state }}
+  ignore_errors: yes
+  with_items:
+    - { name: active-response, mode: 550, owner: root, group: ossec, recurse: no, state: directory }
+    - { name: "active-response/bin/", mode: 550, owner: root, group: ossec, recurse: yes, state: directory }
+    - { name: "active-response/bin", mode: 750, owner: ossec, group: root, recurse: no, state: directory }
+    - { name: agentless, mode: 550, owner: root, group: ossec, recurse: yes, state: directory  }
+    - { name: bin, mode: 550, owner: root, group: ossec, recurse: yes, state: directory }
+    - { name: etc, mode: 550, owner: root, group: ossec, recurse: no, state: directory }
+    - { name: "etc/client.keys", mode: 440, owner: root, group: ossec, recurse: no, state: file }
+    - { name: "etc/decoder.xml", mode: 440, owner: root, group: ossec, recurse: no, state: file } 
+    - { name: "etc/internal_options.conf", mode: 440, owner: root, group: ossec, recurse: no, state: file }
+    - { name: "etc/localtime", mode: 440, owner: root, group: ossec, recurse: no, state: file }
+    - { name: "etc/openssl.conf", mode: 440, owner: root, group: ossec, recurse: no, state: file }
+    - { name: "etc/ossec.conf", mode: 750, owner: root, group: ossec, recurse: no, state: file }
+    - { name: "etc/ossec-init.conf", mode: 750, owner: root, group: ossec, recurse: no, state: file }
+    - { name: "etc/shared", mode: 770, owner: root, group: ossec, recurse: no, state: directory }
+    - { name: logs, mode: 750, owner: ossec, group: ossec, recurse: no, state: directory }
+    - { name: "logs/active-responses.log", mode: 660, owner: ossec, group: ossec, recurse: no, state: file }
+    - { name: "logs/alerts", mode: 750, owner: ossec, group: ossec, recurse: no, state: directory }
+    - { name: "logs/archives", mode: 750, owner: ossec, group: ossec, recurse: no, state: directory }
+    - { name: "logs/firewall", mode: 750, owner: ossec, group: ossec, recurse: no, state: directory }
+    - { name: "logs/ossec.log", mode: 660, owner: ossec, group: ossec, recurse: no, state: directory }
+    - { name: queue, mode: 550, owner: root, group: ossec, recurse: no, state: directory }
+    - { name: "queue/agent-info", mode: 750, owner: ossecr, group: ossec, recurse: no, state: directory }
+    - { name: "queue/agentless", mode: 750, owner: ossec, group: ossec, recurse: no, state: directory }
+    - { name: "queue/alerts", mode: 770, owner: ossec, group: ossec, recurse: no, state: directory }
+    - { name: "queue/diff", mode: 750, owner: ossec, group: ossec, recurse: no, state: directory }
+    - { name: "queue/fts", mode: 750, owner: ossec, group: ossec, recurse: no, state: directory }
+    - { name: "queue/fts-queue", mode: 660, owner: ossec, group: ossec, recurse: no, state: file }
+    - { name: "queue/fts/hostinfo", mode: 660, owner: ossec, group: ossec, recurse: no, state: file }
+    - { name: "queue/fts/ig-queue", mode: 660, owner: ossec, group: ossec, recurse: no, state: file }
+    - { name: "queue/ossec", mode: 770, owner: ossec, group: ossec, recurse: no, state: directory }
+    - { name: "queue/rids", mode: 750, owner: ossecr, group: ossec, recurse: no, state: directory }
+    - { name: "queue/rootcheck", mode: 750, owner: ossec, group: ossec, recurse: no, state: directory }
+    - { name: "queue/rootcheck/rootcheck", mode: 660, owner: ossec, group: ossec, recurse: no, state: file }
+    - { name: "queue/syscheck", mode: 750, owner: ossec, group: ossec, recurse: no, state: directory }
+    - { name: "queue/syscheck/syscheck", mode: 660, owner: ossec, group: ossec, recurse: no, state: file }
+    - { name: rules, mode: 550, owner: root, group: ossec, recurse: yes, state: directory }
+    - { name: stats, mode: 750, owner: ossec, group: ossec, recurse: yes, state: directory }
+    - { name: tmp, mode: 550, owner: root, group: ossec, recurse: no, state: directory }
+    - { name: var, mode: 550, owner: root, group: ossec, recurse: no, state: directory }
+    - { name: "var/run", mode: 770, owner: root, group: ossec, recurse: no, state: directory }
+

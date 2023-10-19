@@ -1,0 +1,48 @@
+---
+
+- name: Ensure ossec group exists
+  group: 
+    name: ossec 
+    system: yes 
+    gid: 2010 
+    state: present
+
+- name: Ensure ossec user exists
+  user: 
+    name: ossec 
+    home: /var/ossec 
+    comment: "OSSEC User" 
+    uid: 2010 
+    group: ossec 
+    state: present
+  when: ossec.server_type == "agent"
+
+- name: Ensure ossec user exists 
+  user: 
+    name: ossec 
+    home: /var/ossec-server 
+    comment: "OSSEC User" 
+    uid: 2010 
+    group: ossec 
+    state: present
+  when: ossec.server_type == "master"
+
+- name: Ensure ossec mail user exists
+  user: 
+    name: ossecm 
+    home: /var/ossec-server 
+    comment: "OSSEC Mail" 
+    uid: 2011 
+    group: ossec 
+    state: present
+  when: ossec.server_type == "master"
+
+- name: Ensure ossec queue user exists
+  user: 
+    name: ossecr 
+    home: /var/ossec-server 
+    comment: "OSSEC Queue" 
+    uid: 2012 
+    group: ossec 
+    state: present
+  when: ossec.server_type == "master"

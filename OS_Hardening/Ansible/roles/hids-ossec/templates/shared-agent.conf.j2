@@ -1,0 +1,186 @@
+<agent_config os="Linux">
+  <syscheck>
+    <!-- Frequency that syscheck is executed -- default every 20 hours -->
+    <frequency>72000</frequency>
+
+    <!-- Directories to check  (perform all possible verifications) -->
+    <directories check_all="yes">/etc,/usr/bin,/usr/sbin</directories>
+    <directories check_all="yes">/bin,/sbin</directories>
+
+    <!-- Files/directories to ignore -->
+    <ignore>/etc/mtab</ignore>
+    <ignore>/etc/hosts.deny</ignore>
+    <ignore>/etc/mail/statistics</ignore>
+    <ignore>/etc/random-seed</ignore>
+    <ignore>/etc/adjtime</ignore>
+    <ignore>/etc/httpd/logs</ignore>
+  </syscheck>
+
+  <rootcheck>
+    <rootkit_files>/var/ossec/etc/shared/rootkit_files.txt</rootkit_files>
+    <rootkit_trojans>/var/ossec/etc/shared/rootkit_trojans.txt</rootkit_trojans>
+  </rootcheck>
+  <localfile>
+    <log_format>syslog</log_format>
+    <location>/var/log/messages</location>
+  </localfile>
+
+  <localfile>
+    <log_format>syslog</log_format>
+    <location>/var/log/authlog</location>
+  </localfile>
+
+  <localfile>
+    <log_format>syslog</log_format>
+    <location>/var/log/secure</location>
+  </localfile>
+
+  <localfile>
+    <log_format>syslog</log_format>
+    <location>/var/log/xferlog</location>
+  </localfile>
+
+  <localfile>
+    <log_format>syslog</log_format>
+    <location>/var/log/maillog</location>
+  </localfile>
+
+  <localfile>
+    <log_format>apache</log_format>
+    <location>/var/www/logs/access_log</location>
+  </localfile>
+
+  <localfile>
+    <log_format>apache</log_format>
+    <location>/var/www/logs/error_log</location>
+  </localfile>
+  <active-response>
+    <disabled>yes</disabled>
+  </active-response>
+</agent_config>
+
+
+<agent_config os="Windows">
+<localfile>
+    <location>Application</location>
+    <log_format>eventlog</log_format>
+  </localfile>
+
+  <localfile>
+    <location>Security</location>
+    <log_format>eventlog</log_format>
+  </localfile>
+
+  <localfile>
+    <location>System</location>
+    <log_format>eventlog</log_format>
+  </localfile>
+<syscheck>
+<disabled>no</disabled>
+	<directories check_all="yes" realtime="yes">D:\TCServer</directories>
+	<directories check_all="yes" realtime="yes">D:\application_variables</directories>
+	<directories check_all="yes" realtime="yes">D:\IISApps</directories>
+	<directories check_all="yes" realtime="yes">D:\IISErrorPages</directories>
+	<directories check_all="yes" realtime="yes">D:\IISSharedConfig</directories>
+	<directories check_all="yes" realtime="yes">C:\Windows/Microsoft.NET/Framework64/v2.0.50727/CONFIG/machine.config</directories>
+	<directories check_all="yes">%WINDIR%/win.ini</directories>
+	<directories check_all="yes">%WINDIR%/system.ini</directories>
+	<directories check_all="yes">C:\autoexec.bat</directories>
+	 <directories check_all="yes">C:\config.sys</directories>
+	<directories check_all="yes">%WINDIR%/System32/at.exe</directories>
+	<directories check_all="yes">%WINDIR%/System32/attrib.exe</directories>
+	<directories check_all="yes">%WINDIR%/System32/cacls.exe</directories>
+	<directories check_all="yes">%WINDIR%/System32/ftp.exe</directories>
+	<directories check_all="yes">%WINDIR%/System32/net.exe</directories>
+	<directories check_all="yes">%WINDIR%/System32/net1.exe</directories>
+	 <directories check_all="yes">%WINDIR%/System32/netsh.exe</directories>
+	<directories check_all="yes">%WINDIR%/System32/reg.exe</directories>
+	<directories check_all="yes">%WINDIR%/regedit.exe</directories>
+	<directories check_all="yes">%WINDIR%/System32/regedt32.exe</directories>
+	<directories check_all="yes">%WINDIR%/System32/regsvr32.exe</directories>
+	<directories check_all="yes">%WINDIR%/System32/runas.exe</directories>
+	<directories check_all="yes">%WINDIR%/System32/sc.exe</directories>
+	<directories check_all="yes">%WINDIR%/System32/subst.exe</directories>
+	<directories check_all="yes">%WINDIR%/System32/drivers/etc</directories>
+	<directories check_all="yes" realtime="yes">C:\Documents and Settings/All Users/Start Menu/Programs/Startup</directories>
+	<ignore type="sregex">.log$|.htm$|.jpg$|.png$|.chm$|.pnf$|.evtx$</ignore>	
+<!-- Commented out all registry keys
+-
+-->
+	<windows_registry>HKEY_LOCAL_MACHINE\SECURITY</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Classes\batfile</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Classes\batfile</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Classes\cmdfile</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Classes\cmdfile</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Classes\comfile</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Classes\comfile</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Classes\exefile</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Classes\exefile</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Classes\piffile</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Classes\piffile</windows_registry>	
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Classes\AllFilesystemObjects</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Classes\AllFilesystemObjects</windows_registry>	
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Classes\Directory</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Folder</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Classes\Folder</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Protocols</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Classes\Protocols</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Policies</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Policies</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Internet Explorer</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Internet Explorer</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Active Setup\Installed Components</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Active Setup\Installed Components</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Run</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\RunOnce</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\URL</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\URL</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Policies</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion\Windows</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion\Winlogon</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Internet Settings</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\KnownDLLs</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\SecurePipeServers\winreg</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\DirectPlayNATHelp\DPNHUPnP</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\DirectPlayNATHelp\DPNHUPnP</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\SYSTEM</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Policies\SYSTEM</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Setup\RecoveryConsole</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion\Setup\RecoveryConsole</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Cryptography</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Policies\Microsoft\Cryptography</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SOFTWARE\PROTX\VPS20\LocalDatabase</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\CrashControl</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\StorageDevicePolicies</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\SecurePipeServers</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Print\Providers\LanMan Print Services\Servers</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\eventlog\SECURITY</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SNMP\Parameters\ValidCommunities</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SNMP\Parameters\PermittedManagers</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SNMP\Parameters\TrapConfiguration</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanManServer\Parameters</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LDAP</windows_registry>
+	<windows_registry>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NetBT\Parameters</windows_registry>
+	<registry_ignore>HKEY_LOCAL_MACHINE\SECURITY\Policy\Secrets</registry_ignore>
+	<registry_ignore>HKEY_LOCAL_MACHINE\SECURITY\SAM\Domains\Account\Users</registry_ignore>
+	<registry_ignore type="sregex">\Enum$</registry_ignore>
+</syscheck>
+<active-response>
+	<disabled>yes</disabled>
+</active-response>
+
+</agent_config>

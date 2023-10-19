@@ -1,0 +1,43 @@
+---
+
+- name: Install Master Config
+  template: 
+    src: ossec.conf.master.j2 
+    dest: /var/ossec-server/etc/ossec.conf 
+    owner: ossec 
+    group: root 
+    mode: 0640
+
+- name: Install Shared Agent Config
+  template: 
+    src: shared-agent.conf.j2 
+    dest: /var/ossec-server/etc/shared/agent.conf 
+    owner: ossec 
+    group: ossec 
+    mode: 0640
+
+- name: Configure Internal Options
+  template: 
+    src: internal_options.conf.j2 
+    dest: /var/ossec-server/etc/internal_options.conf 
+    owner: ossec 
+    group: root 
+    mode: 0640
+
+- name: Configure OpenSSL
+  template: 
+    src: openssl.conf.j2 
+    dest: /var/ossec-server/etc/openssl.conf 
+    owner: root 
+    group: root 
+    mode: 0640
+
+- name: Generate SSL Key
+  shell: openssl genrsa -out /var/ossec-server/etc/sslmanager.key 2048 
+  args:
+    creates: /var/ossec-server/etc/sslmanager.key
+
+- name: Generate SSL Certificate
+  shell: openssl req -new -x509 -config /var/ossec-server/etc/openssl.conf -batch -key /var/ossec-server/etc/sslmanager.key -out /var/ossec-server/etc/sslmanager.cert -days 3650 
+  args:
+    creates: /var/ossec-server/etc/sslmanager.cert

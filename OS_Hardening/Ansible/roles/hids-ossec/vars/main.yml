@@ -1,0 +1,8 @@
+ossec:
+  master: 192.168.2.122
+  email_notify: security.notify@example.com
+  email_to: security@example.com
+  email_from: ossec_master@example.com
+  smtp_server: local.mx.relay.example.com
+  syslog_server: local.syslog.example.com
+  syslog_port: 509

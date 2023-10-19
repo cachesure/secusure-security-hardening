@@ -1,0 +1,41 @@
+---
+
+- include: install.yml 
+  tags: 
+    - install
+
+- include: user.yml 
+  tags: 
+    - install
+    - config
+    - user
+
+- include: agent_config.yml 
+  tags: 
+    - install
+    - config
+    - agent
+  when: ossec.server_type == "agent"
+
+- include: master_config.yml 
+  tags: 
+    - install
+    - config
+    - master
+  when: ossec.server_type == "master"
+
+- include: master_permissions.yml 
+  tags: 
+    - install
+    - config
+    - master
+    - permissions
+  when: ossec.server_type == "master"
+
+- include: master_service.yml 
+  tags: 
+    - install
+    - config
+    - service
+    - master
+  when: ossec.server_type == "master"

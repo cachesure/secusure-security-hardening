@@ -1,0 +1,9 @@
+---
+- name: Start OSSEC Auth Daemon
+  shell: /var/ossec-server/bin/ossec-authd -p 1515 >/dev/null 2>&1 &
+
+- name: Enable OSSEC Syslog Process
+  shell: /var/ossec-server/bin/ossec-control enable client-syslog
+
+- name: Restart OSSEC Services
+  shell: /var/ossec-server/bin/ossec-control restart
