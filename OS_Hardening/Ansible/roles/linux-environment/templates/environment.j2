@@ -1,0 +1,9 @@
+PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
+{% if linux-environment.proxy_host is defined and linux-environment.proxy_host|length %}
+http_proxy={{ linux-environment.proxy_host }}"
+https_proxy="{{ linux-environment.proxy_host }}"
+{% endif %}
+{% if linux-environment.no_proxy is defined and linux-environment.no_proxy|length %}
+no_proxy="{{ linux-environment.no_proxy }}"
+{% endif %}
+

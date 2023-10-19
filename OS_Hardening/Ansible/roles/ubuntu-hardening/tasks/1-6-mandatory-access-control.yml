@@ -1,0 +1,58 @@
+---
+
+- name: "1.6.1.1 > 1.6.1.4 SELinux Controls"
+  debug:
+    msg: "EXCEPTION: SELinux is not provided on Azure Ubuntu images by default. Installing SELinux would require the removal of Azure kernel packages, which could render the systems unusable. AppArmor is provide in the Azure Ubuntu images and will be used as the preferred tool for MAC"
+
+## 1.6.3 Ensure AppArmor is installed
+- name: "1.6.3 Ensure SELinux or AppArmor are installed"
+  package:
+    name: apparmor
+    state: present
+
+## 1.6.2 Configure AppArmor
+- name: "1.6.2.1 CHECK: Ensure AppArmor is not disabled in bootloader configuration"
+  shell: "grep \"apparmor=0\" /boot/grub/grub.cfg"
+  register: apparmor_check
+
+- debug:
+    msg: "SUCCESS: 1.6.2.1 AppArmor is not disabled in the bootloader"
+  when: apparmor_check.stdout is defined and apparmor_check.stdout == ""
+
+- name: "1.6.2.1 ENFORCE: Ensure AppArmor is not disabled in bootloader configuration"
+  block:
+    - replace:
+        path: /etc/default/grub
+        regexp: '(\s+)apparmor=0(\s.*)?$'
+        replace: '\1 \2'
+        validate: "grep \"apparmor=0\" %s"
+
+    - shell: upgrade-grub
+
+    - shell: "grep \"apparmor=0\" /boot/grub/grub.cfg"
+      register: apparmor_check2
+
+    - debug:
+        msg: "SUCCESS: 1.6.2.1 AppArmor is not disabled in the bootloader"
+      when: apparmor_check2.stdout is defined and apparmor_check2.stdout == ""
+    - fail:
+        msg: "ERROR: 1.6.2.1 AppArmor is disabled in the bootloader and cannot be fixed automatically, please check manually"
+      when: apparmor_check2.stdout is defined and apparmor_check2.stdout != ""
+  when: apparmor_check.stdout is defined and apparmor_check.stdout != ""
+
+- name: "1.6.2.2 CHECK: Ensure all AppArmor Profiles are enforcing"
+  shell: "apparmor_status | grep \"[1-9]{1,3}processes are unconfined|[1-9]{1,3} profiles are loaded\""
+  register: profiles_loaded_check
+
+- shell: "apparmor_status | grep \"[1-9]{1,3} profiles are in complain mode\" | awk '{ print $1 }'"
+  register: profiles_complain_check
+
+- shell: "apparmor_status | grep \"[1-9]{1,3}processes are unconfined\" | awk '{ print $1 }'"
+  register: procs_unconfined_check
+
+- name: "1.6.2.2 ENFORCE: Ensure all AppArmor Profiles are enforcing"
+  block:
+    - shell: "aa-enforce /etc/apparmor.d/*"
+
+  when: profiles_loaded_check.stdout == "0" or profiles_complain_check.stdout != "0" or procs_unconfined_check.stdout != "0"
+

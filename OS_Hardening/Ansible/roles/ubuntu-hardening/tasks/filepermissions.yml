@@ -1,0 +1,14 @@
+---
+
+- name: Enforce Permissions
+  file:
+    path: "{{ item.path }}"
+    mode: "{{ item.mode }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    recurse: "{{ item.recurse }}"
+    state: "{{ item.state }}"
+  ignore_errors: true
+  with_items: "{{ harden.file_perms }}"
+
+

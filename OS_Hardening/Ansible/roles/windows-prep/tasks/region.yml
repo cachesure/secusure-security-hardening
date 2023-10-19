@@ -1,0 +1,44 @@
+---
+
+- name: Download en-gb Language Pack
+  win_get_url:
+    url: "{{ region.language_pack }}"
+    dest: C:\lang_pack.cab
+
+- name: Install en-gb Language Pack
+  win_command: dism /Online /Add-Package /PackagePath:"C:\lang_pack.cab"
+  register: lang_pack_install
+
+- name: Reboot
+  win_reboot:
+    msg: "Language pack en-GB installed: This machine is going down for a reboot NOW"
+  when: lang_pack_install.rc == 0
+
+- name: Set Region & Format Settings
+  win_region:
+    format: en-GB
+    location: 242
+    unicode-language: en-GB
+    copy_settings: true
+  register: region_update
+
+- name: Set Default Culture
+  win_command: powershell.exe -
+  args:
+    stdin: Set-Culture en-GB
+
+- name: Set Default Locale
+  win_command: powershell.exe -
+  args:
+    stdin: Set-WinSystemLocale en-GB
+
+- name: Set Default Language
+  win_command: powershell.exe -
+  args:
+    stdin: Set-WinUserLanguageList -LanguageList en-GB -Force
+
+- name: Reboot
+  win_reboot:
+    msg: "Region Settings Updated: This machine is ging down for a reboot NOW"
+  when: region_update.restart_required
+

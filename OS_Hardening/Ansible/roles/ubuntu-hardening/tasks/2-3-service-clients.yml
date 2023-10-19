@@ -1,0 +1,16 @@
+---
+
+- name: "{{ item.control }}"
+  ignore_errors: true
+  package:
+    name: "{{ item.name }}"
+    state: absent
+  with_items:
+    - { name: nis, control: "2.3.1 Ensure NIS Client is not installed" }
+    - { name: rsh-client, control: "2.3.2 Ensure rsh client (rsh-client) is not installed" }
+    - { name: rsh-redone-client, control: "2.3.2 Ensure rsh client (rsh-redone-client) is not installed" }
+    - { name: talk, control: "2.3.3 Ensure talk client is not installed" }
+    - { name: telnet, control: "2.3.4 Ensure telnet client is not installed" }
+    - { name: ldap-utils, control: "2.3.5 Ensure LDAP client is not installed" }
+
+

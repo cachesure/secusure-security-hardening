@@ -1,0 +1,61 @@
+---
+
+- name: "2.2.1.1 Ensure time synchronization is in use - Chrony"
+  package:
+    name: chrony
+
+- name: "2.2.1.2 Ensure ntp is configured"
+  debug:
+    msg: "REASON: Chrony will be used instead of ntp"
+
+- name: "2.2.1.3 Ensure chrony is configured"
+  lineinfile:
+    path: /etc/chrony/chrony.conf
+    line: "server {{ item }}"
+  with_items: "{{ chrony.servers }}"
+  when: chrony is defined and chrony.servers is defined
+
+- name: "2.2.2 Ensure X Window System is not installed"
+  package:
+    name: "xserver-xorg*"
+    state: absent
+
+- name: "{{ item.control }}"
+  ignore_errors: true
+  service:
+    name: "{{ item.name }}"
+    enabled: false
+    state: stopped
+  with_items:
+    - { name: avahi-daemon, control: "2.2.3 Ensure Avahi Server is not enabled" }
+    - { name: cups, control: "2.2.4 Ensure CUPS is not enabled" }
+    - { name: isc-dhcp-server, control: "2.2.5 Ensure DHCP IPv4 Server is not enabled" }
+    - { name: isc-dhcp-server6, control: "2.2.5 Ensure DHCP IPv6 Server is not enabled" }
+    - { name: slapd, control: "2.2.6 Ensure LDAP server is not enabled" }
+    - { name: nfs-server, control: "2.2.7 Ensure NFS and RPC are not enabled" }
+    - { name: rpcbind, control: "2.2.7 Ensure NFS and RPC are not enabled" }
+    - { name: bind9, control: "2.2.8 Ensure DNS Server is not enabled" }
+    - { name: vsftpd, control: "2.2.9 Ensure FTP Server is not enabled" }
+    - { name: apache2, control: "2.2.10 Ensure HTTP server (apache2) is not enabled" }
+    - { name: nginx, control: "2.2.10 Ensure HTTP server (nginx) is not enabled" }
+    - { name: dovecot, control: "2.2.11 Ensure IMAP and POP3 server is not enabled" }
+    - { name: smbd, control: "2.2.12 Ensure Samba is not enabled" }
+    - { name: squid, control: "2.2.13 Ensure HTTP Proxy Server (squid) is not enabled" }
+    - { name: squid3, control: "2.2.13 Ensure HTTP Proxy Server (squid3) is not enabled" }
+    - { name: varnish, control: "2.2.13 Ensure HTTP Proxy Server (varnish) is not enabled" }
+    - { name: snmpd, control: "2.2.14 Ensure SNMP Server is not enabled" }
+    - { name: rsync, control: "2.2.16 Ensure rsync service is not enabled" }
+    - { name: nis, control: "2.2.17 Ensure NIS Server is not enabled" }
+
+- name: "2.2.15 CHECK: Ensure mail transfer agent is configured for local-only mode"
+  shell: "netstat -an | grep LIST | grep \":25[[:space:]]\""
+  register: mta_listen_check
+
+- name: "2.2.15 ENFORCE: Ensure mail transfer agent is configured for local-only mode"
+  replace:
+    path: /etc/postfix/main.cf
+    regexp: '^inet_interfaces = (\s+.*)?$'
+    replace: '^inet_interfaces = loopback-only'
+  when: mta_listen_check.stdout is defined and mta_listen_check.stdout != ""
+
+

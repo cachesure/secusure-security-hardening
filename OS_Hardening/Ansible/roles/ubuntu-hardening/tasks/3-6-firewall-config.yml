@@ -1,0 +1,26 @@
+---
+
+- name: "3.6.1 Ensure iptables is installed"
+  package:
+    name: iptables
+    state: present
+
+- name: "3.6.2 Ensure default deny firewall policy"
+  shell: iptables -L | grep "DROP\|REJECT"
+  register: drop_check
+
+- fail:
+    msg: "ERROR: the default firewall policy must be set to DROP, ensure firewall policy rules are loaded"
+  when: drop_check.stdout is defined and drop_check.stdout == ""
+
+- debug:
+    msg: "SUCCESS: the default firewall policy is set to DROP"
+  when: drop_check.stdout is defined and drop_check.stdout == ""
+
+- name: "3.6.3 CHECK: Ensure loopback traffic is configured"
+  shell: iptables -L INPUT -v -n | grep lo | grep ACCEPT
+  register: lo_in_check
+
+- shell: iptables -L OUTPUT -v -n
+
+

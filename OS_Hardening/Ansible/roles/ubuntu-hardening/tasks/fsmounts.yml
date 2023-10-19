@@ -1,0 +1,13 @@
+---
+
+- name: Ensure partitions configured correctly in /etc/fstab
+  mount:
+    name: "{{ item.mount }}"
+    src: "{{ item.volume }}"
+    fstype: "{{ item.fstype }}"
+    opts: "{{ item.options }}"
+    state: present
+  ignore_errors: true
+  with_items: "{{ harden.partitions }}"
+  when: harden.partitions is defined
+

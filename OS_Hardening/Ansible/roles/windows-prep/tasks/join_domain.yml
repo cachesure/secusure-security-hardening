@@ -1,0 +1,14 @@
+---
+
+- name: Join Domain
+  win_domain_membership:
+    dns_domain_name: "{{ windows.domain }}"
+    domain_admin_user: "{{ windows.domain_admin_user }}"
+    domain_admin_password: "{{ windows.domain_admin_pass }}"
+    domain_ou_path: "{{ windows.server_ou }}"
+    state: domain
+  register: domain_state
+
+- win_reboot:
+  when: domain_state.reboot_required
+

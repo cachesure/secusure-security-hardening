@@ -1,0 +1,24 @@
+---
+
+- name: Install AppArmor
+  apt:
+    name: apparmor
+    force: true
+    state: present
+
+- name: Install AppArmor Utils
+  apt:
+    name: apparmor-utils
+    force: true
+    state: present
+
+- name: Install AppArmor Profiles
+  apt:
+    name: apparmor-profiles
+    force: true
+    state: present
+
+# SKIP FOR NOW; aa-enforce crashes using this command
+#- name: Set AppArmor Profiles To Enforce Mode
+#  shell: aa-enforce /etc/apparmor.d/*
+

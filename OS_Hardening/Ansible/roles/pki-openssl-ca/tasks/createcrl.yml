@@ -1,0 +1,5 @@
+---
+
+- name: Create CRL
+  shell: "{{ openssl_ca_base_path }}/generate-crl"
+

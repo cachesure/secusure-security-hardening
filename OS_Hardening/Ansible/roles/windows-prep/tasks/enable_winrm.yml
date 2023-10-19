@@ -1,0 +1,7 @@
+---
+
+- name: Download WinRM Powershell Script
+
+- name: Enable WinRM
+
+

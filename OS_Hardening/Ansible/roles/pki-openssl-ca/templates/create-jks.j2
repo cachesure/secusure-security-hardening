@@ -1,0 +1,50 @@
+#!/bin/bash
+
+APP_NAME="${1}"
+SERVER_CERT="${2}"
+
+JKS_PATH="{{ openssl_ca_base_path }}/jks"
+CERT_PATH="{{ openssl_ca_base_path }}/certs"
+KEY_PATH="{{ openssl_ca_base_path }}/private"
+CA_CERT="ca"
+
+if [[ "${APP_NAME}" == "" ]];
+then
+  echo "ERROR All arguments must be set"
+  echo "Usage: ${0} <app_name>"
+  exit 1
+fi
+
+TRUSTSTORE_FILE="${JKS_PATH}/${APP_NAME}truststore.jks"
+TRUSTSTORE_PIN="${JKS_PATH}/${APP_NAME}-truststore.pin"
+KEYSTORE_FILE="${JKS_PATH}/${APP_NAME}-keystore.jks"
+KEYSTORE_PIN="${JKS_PATH}/${APP_NAME}-keystore.pin"
+
+if [[ ! -f ${TRUSTSTORE_FILE} ]];
+then
+  KEYSTORE_PW="`openssl rand -hex 12`"
+  echo -e "Creating Truststore..."
+  echo -e "${KEYSTORE_PW}" > "${KEYSTORE_PIN}"
+  echo -e "${KEYSTORE_PW}" > "${TRUSTSTORE_PIN}"
+  echo -e "Importing Local Root CA..."
+  keytool -importcert -noprompt -keystore "${TRUSTSTORE_FILE}" -alias "${CA_CERT}" -storepass ${KEYSTORE_PW} -file "${CERT_PATH}/${CA_CERT}.pem"
+
+  if [[ -f ${KEYSTORE_FILE} ]];
+  then
+    rm ${KEYSTORE_FILE}
+  fi
+
+  if [[ -f "${JKS_PATH}/${SERVER_CERT}.pfx" ]];
+  then
+    rm "${JKS_PATH}/${SERVER_CERT}.pfx"
+  fi
+
+  echo -e "Creating Keystore..."
+  echo -e "${KEYSTORE_PW}" > "${KEYSTORE_PIN}"
+
+  openssl pkcs12 -export -in "${CERT_PATH}/${SERVER_CERT}.pem" -out "${JKS_PATH}/${SERVER_CERT}.pfx" -inkey "${KEY_PATH}/${SERVER_CERT}.key" -password "pass:${KEYSTORE_PW}"
+
+  keytool -noprompt -importkeystore -storepass ${KEYSTORE_PW} -deststorepass ${KEYSTORE_PW} -destkeystore ${KEYSTORE_FILE} -srckeystore ${JKS_PATH}/${SERVER_CERT}.pfx -srcstoretype PKCS12 -srcstorepass ${KEYSTORE_PW} 
+
+fi
+

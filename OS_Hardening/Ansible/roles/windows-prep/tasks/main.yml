@@ -1,0 +1,11 @@
+---
+
+#- import_tasks: region.yml
+
+- import_tasks: join_domain.yml
+
+#- import_tasks: updates.yml
+
+#- import_tasks: enable_winrm.yml
+
+

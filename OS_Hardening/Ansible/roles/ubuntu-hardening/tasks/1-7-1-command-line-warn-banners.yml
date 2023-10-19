@@ -1,0 +1,26 @@
+---
+
+- name: "1.7.1.1, 1.7.1.4 - Update /etc/motd"
+  template:
+    src: motd.j2
+    dest: /etc/motd
+    mode: 0644
+    owner: root
+    group: root
+
+- name: "1.7.1.2, 1.7.1.5 - Update issue banner"
+  template:
+    src: issue.j2
+    dest: /etc/issue
+    mode: 0644
+    owner: root
+    group: root
+
+- name: "1.7.1.3, 1.7.1.6 - Update issue net banner"
+  template:
+    src: issue.net.j2
+    dest: /etc/issue.net
+    mode: 0644
+    owner: root
+    group: root
+

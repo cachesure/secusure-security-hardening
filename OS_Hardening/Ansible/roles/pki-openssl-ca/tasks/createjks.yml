@@ -1,0 +1,5 @@
+---
+
+- name: Create JKS 
+  shell: "{{ openssl_ca_base_path }}/create-jks {{ item }} {{ openssl_jks_cert }}"
+  with_items: "{{ openssl_jks_apps }}"

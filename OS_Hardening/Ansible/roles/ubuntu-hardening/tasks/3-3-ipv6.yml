@@ -1,0 +1,25 @@
+---
+
+- name: "{{ item.control }}"
+  sysctl:
+    name: "{{ item.option }}"
+    value: "{{ item.value }}"
+    state: present
+    sysctl_set: true
+    with_items: "{{ network_params_ipv6 }}"
+
+- name: "3.3.3 CHECK: Ensure IPv6 is disabled"
+  shell: "grep \"ipv6.disable=1\" /boot/grub/grub.cfg"
+  register: ipv6_check
+
+- name: "3.3.3 ENFORCE: Ensure IPv6 is disabled"
+  replace:
+    path: /etc/default/grub
+    regexp: '^GRUB_CMDLINE_LINUX="(\s+.*)"?$'
+    replace: "^GRUB_CMDLINE_LINUX=\"1 ipv6.disable=1\""
+  when: ipv6_check.stdout is defined and ipv6_check.stdout == ""
+
+- shell: "update-grub"
+  when: ipv6_check.stdout is defined and ipv6_check.stdout == ""
+
+

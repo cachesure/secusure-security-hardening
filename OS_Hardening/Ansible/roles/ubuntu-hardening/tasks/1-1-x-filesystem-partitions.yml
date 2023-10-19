@@ -1,0 +1,31 @@
+---
+
+- name: "{{ fs_mount.control }} Ensure {{ fs_mount.name }} is mounted on a separate partition"
+  shell: "mount | grep {{ fs_mount.name }}"
+  register: fs_part
+
+- fail:
+    msg: "ERROR: the filesystem control {{ fs_mount.control }} {{ fs_mount.name }} is not mounted on a seperate partition, please ensure /etc/fstab is updated and the system has been rebooted"
+  when: fs_part.stdout is defined and fs_part.stdout == ""
+
+- name: "{{ fs_mount.control }} Ensure {{ fs_mount.name }} is mounted with option {{ fs_opt }}"
+  shell: "mount | grep {{ fs_mount.name }} | grep {{ fs_opt }}"
+  register: fs_opt_output
+  with_items: "{{ fs_mount.options }}"
+  loop_control:
+    loop_var: fs_opt
+
+- fail:
+    msg: "ERROR: the filesystem control {{ fs_mount.control }} {{ fs_mount.name }} does not have option {{ fs_result.fs_opt }} set, please ensure /etc/fstab is updated and the system has been rebooted"
+  when: fs_result.stdout is defined and fs_result.stdout == ""
+  with_items: "{{ fs_opt_output.results }}"
+  loop_control:
+    loop_var: fs_result
+
+- debug:
+    msg: "SUCCESS: filesystem control {{ fs_mount.control }} {{ fs_mount.name }}"
+  when: fs_result.stdout is defined and fs_result.stdout != ""
+  with_items: "{{ fs_opt_output.results }}"
+  loop_control:
+    loop_var: fs_result
+

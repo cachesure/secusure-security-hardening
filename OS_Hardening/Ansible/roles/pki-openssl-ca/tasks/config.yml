@@ -1,0 +1,30 @@
+---
+
+# Setup the CA keys & certificates
+- include_tasks: createca.yml
+  when: initialize_ca is defined and initialize_ca
+  tags:
+    - createca
+
+- include_tasks: createcsr.yml
+  with_items: "{{ server_certificates }}"
+  tags:
+    - createcsr
+
+# Generate all server certificates
+- include_tasks: createcrt.yml
+  when: sign_crt is defined and sign_crt
+  with_items: "{{ server_certificates }}"
+  tags:
+    - createcrt
+
+- include_tasks: createjks.yml
+  when: sign_crt is defined and sign_crt
+  tags:
+    - createjks
+
+- include_tasks: createcrl.yml
+  when: sign_crt is defined and sign_crt
+  tags:
+    - createcrl 
+

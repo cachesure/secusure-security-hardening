@@ -1,0 +1,30 @@
+---
+
+- name: "1.1.21 CHECK: Disable Automounting"
+  shell: "systemctl is-enabled autofs"
+  register: automount_check
+
+- debug:
+    msg: "SUCCESS: filesystem control 1.1.21"
+  when: automount_check.stdout is defined and automount_check.stdout == "disabled"
+
+- block:
+    - name: "1.1.21 ENFORCE: Disable Automounting"
+      shell: "systemctl disable autofs"
+      register: automount_enforce
+
+    - name: "1.1.21 CHECK: Disable Automounting"
+      shell: "systemctl is-enabled autofs"
+      register: automount_check2
+      when: automount_enforce.rc is defined and automount_enforce.rc == "0"
+
+    - fail:
+        msg: "ERROR: Failed to set sticky bit on world-writable directories, please manually check"
+      when: automount_enforce.rc is defined and automount_enforce.rc != "0"
+
+    - debug:
+        msg: "SUCCESS: filesystem control 1.1.21"
+      when: automount_check2.stdout is defined and automount_check2.stdout == "disabled"
+
+  when: automount_check.stdout is defined and automount_check.stdout != "disabled"
+

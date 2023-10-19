@@ -1,0 +1,13 @@
+#!/bin/bash
+
+CRL_PUB_DIR="/usr/share/nginx/html"
+CA_KEY_PASS="`cat {{ openssl_ca_base_path }}/private/ca.kp`"
+
+openssl ca -batch -config "{{ openssl_ca_base_path }}/openssl.cnf" -gencrl -keyfile "{{ openssl_ca_base_path }}/private/ca.key" -key "${CA_KEY_PASS}" -cert "{{ openssl_ca_base_path }}/certs/ca.pem" -out "{{ openssl_ca_base_path }}/crl/root.crl.pem"
+
+cp "{{ openssl_ca_base_path }}/crl/root.crl.pem" ${CRL_PUB_DIR}
+
+openssl crl -inform PEM -in "{{ openssl_ca_base_path }}/crl/root.crl.pem" -outform DER -out {{ openssl_ca_base_path }}/crl/root.crl
+
+cp "{{ openssl_ca_base_path }}/crl/root.crl" ${CRL_PUB_DIR}
+

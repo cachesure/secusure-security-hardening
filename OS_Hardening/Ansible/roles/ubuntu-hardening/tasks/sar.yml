@@ -1,0 +1,32 @@
+---
+
+- name: Install System Accounting (Sysstat)
+  apt:
+    name: sysstat
+    state: present
+  ignore_errors: true
+
+- name: Configure sysstat Cron
+  cron:
+    name: "Collect System Activity Data"
+    minute: "*/10"
+    hour: "*"
+    job: "/usr/lib/sysstat/sa1 1 1"
+    state: present
+
+- name: Configure sysstat Cron
+  cron:
+    name: "Generate Daily Report"
+    minute: "58"
+    hour: "23"
+    job: "/usr/lib/sysstat/sa2 -A"
+    state: present
+
+- name: Enable Sysstat
+  template:
+    src: default-sysstat.conf.j2
+    dest: /etc/default/sysstat
+    owner: root
+    group: root
+    mode: 0644
+

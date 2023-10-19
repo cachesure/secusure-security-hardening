@@ -1,0 +1,3 @@
+linux-environment:
+  no_proxy: ""
+  proxy_host: ""

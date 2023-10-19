@@ -1,0 +1,14 @@
+---
+
+- name: "1.2.1 Ensure package manager repositories are configured"
+  shell: apt-cache policy
+
+- name: "1.2.2 Ensure GPG keys are configured"
+  shell: apt-key list
+
+- name: "1.8 Ensure updates, patches and additional security software are installed"
+  apt:
+    upgrade: true
+    update_cache: true
+
+

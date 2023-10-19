@@ -1,0 +1,8 @@
+---
+
+- name: Create CSR & Private Key
+  shell: "openssl req -batch -config {{ openssl_ca_base_path }}/{{ openssl_config_file }} -newkey {{ item.type }}:{{ item.bits }} -nodes -keyout {{ openssl_ca_base_path }}/private/{{ item.name }}.key -out {{ openssl_ca_base_path }}/requests/{{ item.name }}.csr -days {{ item.expire_in_days }} -subj \"{{ item.subj }}\""
+  args:
+    creates: "{{ openssl_ca_base_path }}/requests/{{ item.name }}.csr"
+
+

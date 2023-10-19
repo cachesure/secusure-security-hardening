@@ -1,0 +1,98 @@
+---
+
+- name: Create CA Root
+  file:
+    path: "{{ openssl_ca_base_path }}"
+    owner: root
+    group: root
+    mode: 0700
+    state: directory
+ 
+- name: Create CA Directory Structure
+  file:
+    path: "{{ openssl_ca_base_path }}/{{ item }}"
+    owner: root
+    group: root
+    mode: 0700
+    state: directory
+  with_items:
+    - certs
+    - crl
+    - newcerts
+    - private
+    - requests
+    - jks
+
+- name: Template OpenSSL Config
+  template:
+    src: openssl.cnf.j2
+    dest: "{{ openssl_ca_base_path }}/openssl.cnf"
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Template Generate CRL Script
+  template:
+    src: generate-crl.j2
+    dest: "{{ openssl_ca_base_path }}/generate-crl"
+    owner: root
+    group: root
+    mode: 0700
+  tags:
+    - createcrl
+
+- name: Template Create JKS Script
+  template:
+    src: create-jks.j2
+    dest: "{{ openssl_ca_base_path }}/create-jks"
+    owner: root
+    group: root
+    mode: 0700
+
+- name: Generate Random Data
+  shell: "openssl rand -base64 32 > {{ openssl_ca_pass }}"
+  args:
+    creates: "{{ openssl_ca_pass }}"
+
+- name: Set Permissions
+  file:
+    path: "{{ openssl_ca_pass }}"
+    owner: root
+    group: root
+    mode: 0600
+    state: file
+
+- name: Create Root CA Certificate
+  shell: "openssl req -config {{ openssl_ca_base_path }}/{{ openssl_config_file }} -new -x509 -extensions v3_ca -keyout {{ openssl_ca_base_path }}/private/ca.key -out {{ openssl_ca_base_path }}/certs/ca.pem -days 3650 -passout file:{{ openssl_ca_pass }} -subj \"{{ openssl_ca_subj }}\""
+  args:
+    creates: "{{ openssl_ca_base_path }}/certs/ca.pem"
+
+- name: Set Permissions on CA Key & Cert
+  file:
+    path: "{{ openssl_ca_base_path }}/{{ item }}"
+    owner: root
+    group: root
+    mode: 0400
+    state: file
+  with_items:
+    - certs/ca.pem
+    - private/ca.key
+
+- name: Create CA Index File
+  file:
+    path: "{{ openssl_ca_base_path }}/index.txt"
+    owner: root
+    group: root
+    mode: 0600
+    state: touch
+
+- name: Set Serial Start
+  shell: echo 1000 >> "{{ openssl_ca_base_path }}/serial"
+  args:
+    creates: "{{ openssl_ca_base_path }}/serial"
+
+- name: Set CRL Number
+  shell: echo 1000 >> "{{ openssl_ca_base_path }}/crlnumber"
+  args:
+    creates: "{{ openssl_ca_base_path }}/crlnumber"
+

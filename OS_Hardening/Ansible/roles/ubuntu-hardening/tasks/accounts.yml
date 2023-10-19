@@ -1,0 +1,107 @@
+---
+
+- name: Remove Users
+  user:
+    name: "{{ item }}"
+    state: absent
+    remove: true
+  ignore_errors: true
+  with_items: "{{ harden.users.remove }}"
+
+- name: Remove Groups
+  group:
+    name: "{{ item }}"
+    state: absent
+  ignore_errors: true
+  with_items: "{{ harden.user_groups.remove }}"
+
+- name: Add required groups
+  group:
+    name: "{{ item }}"
+    state: present
+  ignore_errors: true
+  with_items: "{{ harden.user_groups.add }}"
+
+- name: Disable Inactive User Accounts
+  shell: useradd -D -f "{{ harden.account.inactive_days }}"
+
+- name: Configure useradd
+  template:
+    src: default-useradd.j2
+    dest: /etc/default/useradd
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Configure common-password
+  template:
+    src: common-password.j2
+    dest: /etc/pam.d/common-password
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Configure pam login
+  template:
+    src: pam-login.j2
+    dest: /etc/pam.d/login
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Configure common-session
+  template:
+    src: common-session.j2
+    dest: /etc/pam.d/common-session
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Configure pam sshd
+  template:
+    src: pam-sshd.j2
+    dest: /etc/pam.d/sshd
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Configure common-auth
+  template:
+    src: common-auth.j2
+    dest: /etc/pam.d/common-auth
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Configure login defs
+  template:
+    src: login.defs.j2
+    dest: /etc/login.defs
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Configure default profile
+  template:
+    src: etc-profile.j2
+    dest: /etc/profile
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Configure adduser
+  template:
+    src: etc-adduser.conf.j2
+    dest: /etc/adduser.conf
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Configure valid shells
+  template:
+    src: etc-shells.j2
+    dest: /etc/shells
+    mode: 0644
+    owner: root
+    group: root
+

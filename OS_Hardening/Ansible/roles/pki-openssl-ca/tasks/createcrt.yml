@@ -1,0 +1,18 @@
+---
+
+- name: Sign CSR & Generate Cert
+  shell: "openssl ca -batch -passin file:{{ openssl_ca_pass }} -config {{ openssl_ca_base_path }}/{{ openssl_config_file }} -out {{ openssl_ca_base_path }}/certs/{{ item.name }}.crt -infiles {{ openssl_ca_base_path }}/requests/{{ item.name }}.csr"
+  args:
+    creates: "{{ openssl_ca_base_path }}/certs/{{ item.name }}.crt"
+
+- name: Create a PEM
+  shell: "openssl x509 -in {{ openssl_ca_base_path }}/certs/{{ item.name }}.crt -out {{ openssl_ca_base_path }}/certs/{{ item.name }}.pem -outform PEM"
+  args:
+    creates: "{{ openssl_ca_base_path }}/certs/{{ item.name }}.pem"
+
+- name: Create a Chain
+  shell: "cat {{ openssl_ca_base_path }}/certs/ca.pem {{ openssl_ca_base_path }}/certs/{{ item.name }}.pem > {{ openssl_ca_base_path }}/certs/{{ item.name }}-chain.pem"
+  args:
+    creates: "{{ openssl_ca_base_path }}/certs/{{ item.name }}-chain.pem"
+
+

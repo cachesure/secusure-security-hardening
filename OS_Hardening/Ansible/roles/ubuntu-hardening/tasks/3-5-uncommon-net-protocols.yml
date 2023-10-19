@@ -1,0 +1,24 @@
+---
+
+- name: "{{ item.control }}"
+  template:
+    src: modprobe_proto.conf.j2
+    dest: "/etc/modprobe.d/{{ item.name }}.conf"
+    mode: 0644
+    owner: root
+    group: root
+
+- shell: "modprobe -n -v {{ item.name }}"
+
+- shell: "lsmod | grep {{ item.name }}"
+  register: check_proto_load
+
+- fail:
+    msg: "ERROR: {{ item.name }} appears to be loaded, please manually check"
+  when: check_proto_load.stdout is defined and check_proto_load.stdout != ""
+
+- debug:
+    msg: "SUCCESS: protocol control {{ item.control }}"
+  when: check_proto_load.stdout is defined and check_proto_load.stdout == ""
+
+

@@ -1,0 +1,25 @@
+---
+
+- name: "1.4.1 Ensure permissions on bootloader config are configured"
+  file:
+    path: /boot/grub/grub.cfg
+    owner: root
+    group: root
+    mode: 0400
+
+- name: "1.4.2 Ensure bootloader password is set"
+  debug:
+    msg: "EXCEPTION: Serial console access is disabled by default, and can only be enabled by an Administrator."
+
+- name: "1.4.3 CHECK: Ensure authentication required for single user mode"
+  shell: "grep ^root:[*!]: /etc/shadow"
+  register: single_user_check
+
+- fail:
+    msg: "ERROR: 1.4.3 the root user does not have a password set, please manually set one 'passwd root'"
+  when: single_user_check.stdout is defined and single_user_check.stdout != ""
+
+- debug:
+    msg: "SUCCESS: 1.4.3 the root user has a password set"
+  when: single_user_check.stdout is defined and single_user_check.stdout == ""
+

@@ -1,0 +1,22 @@
+---
+
+- name: Ensure auditd is installed
+  apt:
+    name: auditd
+    state: present
+
+- name: Set Maximum Audit Log Size
+  lineinfile:
+    dest: /etc/audit/auditd.conf
+    regexp: "^max_log_file"
+    line: "max_log_file = 10"
+
+- name: Configure audit to log during grub boot
+  lineinfile:
+    dest: /etc/default/grub
+    regexp: 'GRUB_CMDLINE_LINUX="audit=1"'
+    line: 'GRUB_CMDLINE_LINUX="audit=1"'
+
+- name: Update Grub config
+  shell: update-grub
+

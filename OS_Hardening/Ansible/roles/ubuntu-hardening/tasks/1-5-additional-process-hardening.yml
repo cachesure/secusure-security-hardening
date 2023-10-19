@@ -1,0 +1,101 @@
+---
+
+## Control 1.5.1 Core Dumps
+
+- name: "1.5.1 ENFORCE: Ensure core dumps are restricted"
+  lineinfile:
+    path: /etc/security/limits.conf
+    line: "* hard core 0"
+    insertafter: EOF
+
+- shell: "sysctl -w fs.suid_dumpable=0"
+
+- lineinfile:
+    path: /etc/sysctl.conf
+    regexp: "^fs.suid_dumpable"
+    line: "fs.suid_dumpable=0"
+
+- name: "1.5.1 CHECK: Ensure core dumps are restricted"
+  shell: "grep \"* hard core 0\" /etc/security/limits.conf"
+  register: hard_core_check
+
+- fail:
+    msg: "ERROR: 1.5.1 unable to enforce restrictions on core dumps in /etc/security/limits.conf, please manually check"
+  when: hard_core_check.stdout is defined and hard_core_check.stdout == ""
+
+- shell: "sysctl fs.suid_dumpable | cut -d= -f2-2 | sed 's/^ //g'"
+  register: sysctl_suid_check
+
+- fail:
+    msg: "ERROR: 1.5.1 unable to enforce restrictions on core dumps via sysctl, please manually check"
+  when: sysctl_suid_check.stdout is defined and sysctl_suid_check.stdout != "0"
+
+- shell: "grep \"fs.suid_dumpable=0\" /etc/sysctl.conf"
+  register: conf_suid_check
+
+- fail:
+    msg: "ERROR: 1.5.1 unable to enforce restrictions on core dumps in /etc/sysctl.conf, please manually check"
+  when: conf_suid_check.stdout is defined and conf_suid_check.stdout == ""
+
+- debug:
+    msg: "SUCCESS: 1.5.1 core dumps are restricted"
+  when: conf_suid_check.stdout != "" and sysctl_suid_check.stdout == "0" and conf_suid_check.stdout != ""
+
+## Control 1.5.2 NX Support
+
+- name: "1.5.2 Ensure XD/NX support is enabled"
+  shell: "dmesg | grep \"NX (Execute Disable)\""
+  register: nx_support_check
+
+- debug:
+    msg: "WARN: NX is not enabled in this kernel or is not supported by the CPU"
+  when: nx_support_check.stdout is defined and nx_support_check.stdout == ""
+
+- debug:
+    msg: "SUCCESS: 1.5.2 NX support is enabled"
+  when: nx_support_check.stdout is defined and nx_support_check.stdout != ""
+
+## Control 1.5.3 ASLR should be enabled
+
+- name: "1.5.3 ENFORCE: Ensure address space layout randomization (ALSR) is enabled"
+- shell: "sysctl -w kernel.randomize_va_space=2"
+
+- lineinfile:
+    path: /etc/sysctl.conf
+    regexp: "^kernel.randomize_va_space"
+    line: "kernel.randomize_va_space=2"
+
+- name: "1.5.3 CHECK: Ensure address space layout randomization (ALSR) is enabled"
+- shell: "sysctl kernel.randomize_va_space | cut -d= -f2-2 | sed 's/^ //g'"
+  register: sysctl_alsr_check
+
+- fail:
+    msg: "ERROR: 1.5.3 unable to enable ALSR via sysctl, please manually check"
+  when: sysctl_alsr_check.stdout is defined and sysctl_alsr_check.stdout != "2"
+
+- shell: "grep \"kernel.randomize_va_space=2\" /etc/sysctl.conf"
+  register: conf_alsr_check
+
+- fail:
+    msg: "ERROR: 1.5.3 unable to enable ALSR in /etc/sysctl.conf, please manually check"
+  when: conf_alsr_check.stdout is defined and conf_alsr_check.stdout == ""
+
+- debug:
+    msg: "SUCCESS: 1.5.3 ALSR is enabled"
+  when: conf_alsr_check.stdout != "" and sysctl_alsr_check.stdout == "0"
+
+### Control 1.5.4 Prelink should be disabled
+
+- name: "1.5.4 CHECK: Ensure prelink is disabled"
+  shell: "dpkg -s prelink"
+  register: prelink_check
+
+- name: "1.5.4 ENFORCE: Ensure prelink is disabled"
+  shell: "prelink -ua"
+  when: prelink_check.stdout is defined and prelink_check.stdout != "" and prelink_check.rc == "0"
+
+- package:
+    name: prelink
+    state: absent
+  when: prelink_check.stdout is defined and prelink_check.stdout != "" and prelink_check.rc == "0"
+

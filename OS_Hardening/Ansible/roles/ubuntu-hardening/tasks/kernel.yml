@@ -1,0 +1,17 @@
+---
+
+- name: Update Kernel Config
+  sysctl:
+    name: "{{ item.option }}"
+    value: "{{ item.value }}"
+    state: present
+  with_items: "{{ harden.kernel }}"
+
+- name: Disable Core Dumps
+  template:
+    src: security-limits.conf.j2
+    dest: /etc/security-limits.conf
+    owner: root
+    group: root
+    mode: 0644
+

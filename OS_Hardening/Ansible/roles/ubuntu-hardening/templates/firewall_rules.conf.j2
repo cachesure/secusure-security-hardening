@@ -1,0 +1,54 @@
+*filter
+:INPUT DROP [0:0]
+:FORWARD DROP [0:0]
+:OUTPUT DROP [0:0]
+:LOGGING - [0:0]
+
+-A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+
+# Inbound Rules
+{% if security_groups is defined %}
+{% for group in securitygroups %}
+{% if group.inbound is defined %}
+{% for rule_in in group.inbound %}
+{% if rule_in.access == "Allow" %}
+{% if rule_in.protocol != "icmp" %}
+{% if rule_in.destport != "*" %}
+-A INPUT -i eth0 -s {{ rule_in.srcaddr }} -p {{ rule_in.protocol }} --dport {{ rule_in.destport }} -m state --state NEW,ESTABLISHED -j ACCEPT
+{% endif %}
+{% endif %}
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+-A INPUT -i lo -j ACCEPT
+-A INPUT -j LOGGING
+
+# Outbound Rules
+-A OUTPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+{% if security_groups is defined %}
+{% for group in securitygroups %}
+{% if group.outbound is defined %}
+{% for rule_out in group.inbound %}
+{% if rule_out.access == "Allow" %}
+{% if rule_out.protocol != "icmp" %}
+{% if rule_out.destport != "*" %}
+-A OUTPUT -o eth0 -d {{ rule_out.destaddr }} -p {{ rule_out.protocol }} --dport {{ rule_out.destport }} -m state --state NEW,ESTABLISHED -j ACCEPT
+{% endif %}
+{% endif %}
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+-A OUTPUT -o lo -j ACCEPT
+-A OUTPUT -j LOGGING
+
+-A INPUT -s 127.0.0.0/8 -j DROP
+
+-A LOGGING -j DROP
+COMMIT
+

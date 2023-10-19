@@ -1,0 +1,23 @@
+---
+
+- name: "1.1.1 Disable unused filesystems"
+  template:
+    src: modprobe_fs.conf.j2
+    dest: "/etc/modprobe.d/{{ item.name }}.conf"
+    mode: 0644
+    owner: root
+    group: root
+
+- shell: "modprobe -n -v {{ item.name }}"
+
+- shell: "lsmod | grep {{ item.name }}"
+  register: check_fs_load
+
+- fail:
+    msg: "ERROR: the filesystem control {{ item.control }} {{ item.name }} appears to be loaded, please manually check"
+  when: check_fs_load.stdout is defined and check_fs_load.stdout != ""
+
+- debug:
+    msg: "SUCCESS: filesystem control {{ item.control }} {{ item.name }}"
+  when: check_fs_load.stdout is defined and check_fs_load.stdout == ""
+

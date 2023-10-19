@@ -1,0 +1,5 @@
+---
+
+- name: Install Windows Updates (Critical, Security & Rollups)
+  win_updates:
+

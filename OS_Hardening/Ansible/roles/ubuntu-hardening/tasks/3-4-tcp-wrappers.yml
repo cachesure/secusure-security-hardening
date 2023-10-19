@@ -1,0 +1,31 @@
+---
+
+- name: "3.4.1 Ensure TCP Wrappers is installed"
+  package:
+    name: tcpd
+    state: present
+
+- name: "3.4.2 Ensure /etc/hosts.allow is configured"
+  lineinfile:
+    path: /etc/hosts.allow
+    line: "ALL: {{ item }}"
+    backup: true
+  with_items: "{{ tcp_wrappers.allow_hosts }}"
+
+- name: "3.4.3 Ensure /etc/hosts.deny is configured"
+  lineinfile:
+    path: /etc/hosts.deny
+    line: "ALL: {{ item }}"
+    backup: true
+  with_items: "{{ tcp_wrappers.deny_hosts }}"
+
+- name: "{{ item.control }}"
+  file:
+    path: "{{ item.path }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+  with_items:
+    - { control: "3.4.4 Ensure permissions on /etc/hosts.allow are configured", path: /etc/hosts.allow, owner: root, group: root, mode: 0644 }
+    - { control: "3.4.5 Ensure permissions on /etc/hosts.deny are configured", path: /etc/hosts.deny, owner: root, group: root, mode: 0644 }
+

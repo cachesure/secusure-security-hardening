@@ -1,0 +1,7 @@
+---
+
+- name: "1.7.2 Ensure GDM login banner is configured"
+  debug:
+    msg: "EXCEPTION: The Gnome Desktop Manager is not installed on the Ubuntu servers, so this control is not applicable"
+
+

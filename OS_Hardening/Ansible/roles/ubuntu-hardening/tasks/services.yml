@@ -1,0 +1,19 @@
+---
+
+- name: Remove Unwanted Services
+  apt:
+    name: "{{ item }}"
+    state: absent
+  ignore_errors: true
+  with_items: "{{ services.uninstall }}"
+  when: services.uninstall is defined
+
+- name: Ensure Services Are Installed
+  apt:
+    name: "{{ item }}"
+    state: present
+  ignore_errors: true
+  with_items: "{{ services.install }}"
+  when: services.install is defined
+
+

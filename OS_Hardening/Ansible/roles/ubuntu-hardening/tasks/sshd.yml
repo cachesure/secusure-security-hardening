@@ -1,0 +1,20 @@
+---
+
+- name: "5.2.2 > 5.2.15 - Update SSH Config"
+  template:
+    src: sshd.j2
+    dest: /etc/ssh/sshd_config
+
+- name: "5.2.1 - Set permissions on /etc/ssh/sshd_config"
+  file:
+    path: /etc/ssh/sshd_config
+    mode: 0600
+    owner: root
+    group: root
+
+- name: Restart SSH Daemon
+  service:
+    name: ssh
+    state: restarted
+
+

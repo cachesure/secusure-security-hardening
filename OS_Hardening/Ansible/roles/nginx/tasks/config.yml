@@ -1,0 +1,16 @@
+---
+
+- name: Template Default Site Config
+  template:
+    src: "{{ site_name }}.conf.j2"
+    dest: /etc/nginx/nginx.conf
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Enable Nginx
+  service:
+    name: nginx
+    state: restarted
+    enabled: yes 
+

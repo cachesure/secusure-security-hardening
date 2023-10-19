@@ -1,0 +1,11 @@
+---
+
+- include_tasks: install.yml
+  tags:
+    - install
+
+- include_tasks: config.yml
+  when: openssl_mode is not defined
+  tags:
+    - config
+

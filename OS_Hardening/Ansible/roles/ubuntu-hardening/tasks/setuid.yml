@@ -1,0 +1,8 @@
+---
+
+- name: Remove Setuid From Files
+  command: chmod a-s "{{ item.path }}"
+  ignore_errors: true
+  with_items: "{{ harden.file_setuid }}"
+
+

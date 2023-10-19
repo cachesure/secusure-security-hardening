@@ -1,0 +1,31 @@
+MAIL_DIR        /var/mail
+FAILLOG_ENAB            yes
+LOG_UNKFAIL_ENAB        yes
+LOG_OK_LOGINS           no
+SYSLOG_SU_ENAB          yes
+SYSLOG_SG_ENAB          yes
+FAKE_SHELL	{{ harden.account.default_shell }}
+FTMP_FILE       /var/log/btmp
+SU_NAME         su
+HUSHLOGIN_FILE  .hushlogin
+ENV_SUPATH      PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ENV_PATH        PATH=/usr/local/bin:/usr/bin:/bin
+TTYGROUP        tty
+TTYPERM         0600
+ERASECHAR       0177
+KILLCHAR        025
+PASS_MAX_DAYS {{ harden.account.pass_max_days }}
+PASS_MIN_DAYS {{ harden.account.pass_min_days }}
+PASS_WARN_AGE {{ harden.account.pass_warn_age }}
+UID_MIN 		{{ harden.account.uid_min }}
+UID_MAX                 {{ harden.account.uid_max }}
+GID_MIN 		{{ harden.account.gid_min }}
+GID_MAX                 {{ harden.account.gid_max }}
+LOGIN_RETRIES           5
+LOGIN_TIMEOUT           60
+CHFN_RESTRICT           rwh
+DEFAULT_HOME    yes
+USERGROUPS_ENAB yes
+ENCRYPT_METHOD SHA512
+UMASK {{ harden.account.umask }}
+

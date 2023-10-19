@@ -1,0 +1,29 @@
+---
+
+- name: "2.1 inetd Services"
+  package:
+    name: xinetd
+    state: absent
+
+- name: "{{ item.control }} Ensure chargen services are not enabled"
+  debug:
+    msg: "REASON: The Xinetd package is not required, nor installed. To restrict the use of {{ item.name }}, the hardening process will ensure xinetd is not installed"
+  with_items:
+    - { name: chargen, control: "2.1.1" }
+    - { name: daytime, control: "2.1.2" }
+    - { name: discard, control: "2.1.3" }
+    - { name: echo, control: "2.1.4" }
+    - { name: time, control: "2.1.5" }
+    - { name: rsh, control: "2.1.6" }
+    - { name: talk, control: "2.1.7" }
+    - { name: telnet, control: "2.1.8" }
+    - { name: tftp, control: "2.1.9" }
+    - { name: xinetd, control: "2.1.10" }
+
+- name: "2.1.11 Ensure openbsd-inetd is not installed"
+  package:
+    name: openbsd-inetd
+    state: absent
+
+
+

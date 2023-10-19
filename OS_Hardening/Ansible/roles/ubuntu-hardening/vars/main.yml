@@ -1,0 +1,234 @@
+---
+chrony:
+  servers:
+    - 127.0.0.1
+network_params_ipv4:
+  - { control: "3.1.1 Ensure IP forwarding is disabled", option: "net.ipv4.ip_forward", value: 0 }
+  - { control: "3.1.2 Ensure packet redirect sending (all) is disabled", option: "net.ipv4.conf.all.send_redirects", value: 0 }
+  - { control: "3.1.2 Ensure packet redirect sending (default) is disabled", option: "net.ipv4.conf.default.send_redirects", value: 0 }
+  - { control: "3.2.1 Ensure source routed packets (all) are not accepted", option: "net.ipv4.conf.all.accept_source_route", value: 0 }
+  - { control: "3.2.1 Ensure source routed packets (default) are not accepted", option: "net.ipv4.conf.default.accept_source_route", value: 0 }
+  - { control: "3.2.2 Ensure ICMP redirects (all) are not accepted", option: "net.ipv4.conf.all.accept_redirects", value: 0 }
+  - { control: "3.2.2 Ensure ICMP redirects (default) are not accepted", option: "net.ipv4.conf.default.accept_redirects", value: 0 }
+  - { control: "3.2.3 Ensure secure ICMP redirects (all) are not accepted", option: "net.ipv4.conf.all.secure_redirects", value: 0 }
+  - { control: "3.2.3 Ensure secure ICMP redirects (default) are not accepted", option: "net.ipv4.conf.default.secure_redirects", value: 0 }
+  - { control: "3.2.4 Ensure suspicious packets (all) are logged", option: "net.ipv4.conf.all.log_martians", value: 1 }
+  - { contorl: "3.2.4 Ensure suspicious packets (default) are logged", option: "net.ipv4.conf.default.log_martians", value: 1 }
+  - { control: "3.2.5 Ensure broadcast ICMP requests are ignored", option: "net.ipv4.icmp_echo_ignore_broadcasts", value: 1 }
+  - { control: "3.2.6 Ensure bogus ICMP responses are ignored", option: "net.ipv4.icmp_ignore_bogus_error_responses", value: 1 }
+  - { control: "3.2.7 Ensure Reverse Path Filtering (all) is enabled", option: "net.ipv4.conf.all.rp_filter", value: 1 }
+  - { control: "3.2.7 Ensure Reverse Path Filtering (default) is enabled", option: "net.ipv4.conf.default.rp_filter", value: 1 }
+  - { control: "3.2.8 Ensure TCP SYN Cookies is enabled", option: "net.ipv4.tcp_syncookies", value: 1 }
+  - { control: "3.2.x Increase max SYN backlog to mitigate low volume SYN flood", option: "net.ipv4.tcp_max_syn_backlog", value: 4096 }
+  - { control: "3.2.x Set max number of allowed TCP sockets in an orphaned state", option: "net.ipv4.tcp_max_orphans", value: 8192 }
+  - { control: "3.2.x Set the local port range for outbound connections", option: "net.ipv4.ip_local_port_range", value: "10000 65535" }
+  - { control: "3.2.x Set the local port range for outbound connections", option: "net.ipv4.ip_local_port_range", value: "10000 65535" }
+network_params_ipv6:
+  - { control: "3.3.1 Ensure IPv6 router advertisements (all) are not accepted", option: "net.ipv6.conf.all.accept_ra", value: "0" }
+  - { control: "3.3.1 Ensure IPv6 router advertisements (default) are not accepted", option: "net.ipv6.conf.default.accept_ra", value: "0" }
+  - { control: "3.3.2 Ensure IPv6 redirects (all) are not accepted", option: "net.ipv6.conf.all.accept_redirects", value: "0" }
+  - { control: "3.3.2 Ensure IPv6 redirects (default) are not accepted", option: "net.ipv6.conf.default.accept_redirects", value: "0" }
+
+tcp_wrappers:
+  allow_hosts:
+    - 192.168.0.0/255.255.0.0
+  deny_hosts:
+    - ALL
+firewall_default:
+  action: DROP
+  log_dropped: true
+
+firewall_hosts:
+  domain_controllers:
+
+firewall_ports:
+  all: { ports: [ all ], proto: [ tcp, udp, icmp ] }
+  dns: { ports: [ 53 ], proto: [ tcp, udp ] }
+  http: { ports: [ 80 ], proto: [ tcp ] }
+  https: { ports: [ 443 ], proto: [ tcp ] }
+  ping_reply: { proto: icmp, type: "echo-reply" }
+  ping_request: { proto: icmp, type: "echo-request" }
+  ssh: { ports: [ 22 ], proto: [ tcp ] }
+
+services:
+  install:
+    - libpam-tmpdir
+    - apt-listchanges
+    - debbugs
+    - debian-goodies
+    - lynis
+    - debsecan
+    - debsums
+    - needrestart
+
+harden:
+  account:
+    default_shell: "/bin/bash"
+    default_home: "/home"
+    home_skel: "/etc/skel"
+    default_users_gid: 100
+    inactive_days: 35
+    fail_delay: 3000000
+    session_timeout: 300
+    lock_attempts: 5
+    unlock_time: 900
+    pass_max_days: 90
+    pass_min_days: 7
+    pass_warn_age: 7
+    uid_min: 2000
+    gid_min: 2000
+    uid_max: 4000
+    gid_max: 4000
+    umask: "027"
+  file_setuid:
+    - { path: /usr/sbin/pppd, remove_setuid: true }
+    - { path: /usr/lib/policykit-1/polkit-agent-helper-1, remove_setuid: true }
+    - { path: /usr/lib/pt_chown, remove_setuid: true }
+    - { path: /usr/bin/pkexec, remove_setuid: true }
+    - { path: /usr/bin/bsd-write, remove_setuid: true }
+    - { path: /usr/bin/dotlockfile, remove_setuid: true }
+    - { path: /usr/bin/mail-lock, remove_setuid: true }
+    - { path: /usr/bin/newgrp, remove_setuid: true }
+    - { path: /usr/bin/traceroute6.iputils, remove_setuid: true }
+    - { path: /usr/bin/mail-touchlock, remove_setuid: true }
+    - { path: /usr/bin/mail-unlock, remove_setuid: true }
+  file_perms:
+    - { path: /etc/hosts.allow, mode: 644, owner: root, group: root, state: file, recurse: false }
+    - { path: /etc/hosts.deny, mode: 644, owner: root, group: root, state: file, recurse: false }
+    - { path: /boot/grub/grub.cfg, mode: 770, owner: root, group: root, state: file, recurse: false }
+    - { path: /etc/crontab, mode: 640, owner: root, group: root, state: file, recurse: false }
+    - { path: /etc/cron.hourly, mode: 750, owner: root, group: root, state: directory, recurse: false }
+    - { path: /etc/cron.daily, mode: 750, owner: root, group: root, state: directory, recurse: false }
+    - { path: /etc/cron.weekly, mode: 750, owner: root, group: root, state: directory, recurse: false }
+    - { path: /etc/cron.monthly, mode: 750, owner: root, group: root, state: directory, recurse: false }
+    - { path: /etc/cron.d, mode: 750, owner: root, group: root, state: directory, recurse: false }
+    - { path: /etc/ssh/sshd_config, mode: 644, owner: root, group: root, state: file, recurse: false }
+    - { path: /etc/motd, mode: 644, owner: root, group: root, state: file, recurse: false }
+    - { path: /etc/issue, mode: 644, owner: root, group: root, state: file, recurse: false }
+    - { path: /etc/issue.net, mode: 644, owner: root, group: root, state: file, recurse: false }
+    - { path: /etc/passwd, mode: 644, owner: root, group: root, state: file, recurse: false }
+    - { path: /etc/shadow, mode: 640, owner: shadow, group: root, state: file, recurse: false }
+    - { path: /etc/gshadow, mode: 640, owner: shadow, group: root, state: file, recurse: false }
+    - { path: /etc/group, mode: 644, owner: root, group: root, state: file, recurse: false }
+    - { path: /etc/securetty, mode: 640, owner: root, group: root, state: file, recurse: false }
+    - { path: /etc, mode: 755, owner: root, group: root, state: directory, recurse: false }
+    - { path: /etc/init.d, mode: 750, owner: root, group: root, state: directory, recurse: false }
+    - { path: /etc/sssd/sssd.conf, mode: 600, owner: root, group: root, state: file, recurse: false }
+    - { path: /sbin, mode: 755, owner: root, group: root, state: directory, recurse: false }
+    - { path: /tmp, mode: 1777, owner: root, group: root, state: directory, recurse: false }
+    - { path: /usr, mode: 755, owner: root, group: root, state: directory, recurse: false }
+    - { path: /var, mode: 755, owner: root, group: root, state: directory, recurse: false }
+    - { path: /var/log, mode: 755, owner: root, group: syslog, state: directory, recurse: false }
+    - { path: /, mode: 755, owner: root, group: root, state: directory, recurse: false }
+    - { path: /sbin/shutdown, mode: 750, owner: root, group: root, state: file, recurse: false }
+    - { path: /sbin/halt, mode: 750, owner: root, group: root, state: file, recurse: false }
+    - { path: /sbin/reboot, mode: 750, owner: root, group: root, state: file, recurse: false }
+    - { path: /usr/sbin/tcpdump, mode: 750, owner: root, group: root, state: file, recurse: false }
+    - { path: /dev/mem, mode: 640, owner: root, group: root, state: file, recurse: false }
+    - { path: /etc/sysctl.conf, mode: 600, owner: root, group: root, state: file, recurse: false }
+    - { path: /etc/fuse.conf, mode: 644, owner: root, group: sys, state: file, recurse: false }
+    - { path: /usr/local/lib/python2.7, mode: 755, owner: root, group: sys, state: directory, recurse: false }
+    - { path: /usr/local/lib/python3.4, mode: 755, owner: root, group: sys, state: directory, recurse: false }
+    - { path: /var/local, mode: 755, owner: root, group: sys, state: directory, recurse: false }
+    - { path: /usr/local/share/ca-certificates, mode: 755, owner: root, group: sys, state: directory, recurse: false }
+    - { path: /usr/local/share/xml, mode: 755, owner: root, group: sys, state: directory, recurse: false }
+    - { path: /usr/local/share/sgml, mode: 755, owner: root, group: sys, state: directory, recurse: false }
+    - { path: /var/log/auth.log, mode: 640, owner: syslog, group: adm, state: touch, recurse: false }
+    - { path: /var/log/syslog, mode: 640, owner: syslog, group: adm, state: touch, recurse: false }
+    - { path: /var/log/cron.log, mode: 640, owner: syslog, group: adm, state: touch, recurse: false }
+    - { path: /var/log/daemon.log, mode: 640, owner: syslog, group: adm, state: touch, recurse: false }
+    - { path: /var/log/mail.log, mode: 640, owner: syslog, group: adm, state: touch, recurse: false }
+    - { path: /var/log/user.log, mode: 640, owner: syslog, group: adm, state: touch, recurse: false }
+    - { path: /var/log/mail.info, mode: 640, owner: syslog, group: adm, state: touch, recurse: false }
+    - { path: /var/log/mail.warn, mode: 640, owner: syslog, group: adm, state: touch, recurse: false }
+    - { path: /var/log/mail.err, mode: 640, owner: syslog, group: adm, state: touch, recurse: false }
+    - { path: /var/log/messages, mode: 640, owner: syslog, group: adm, state: touch, recurse: false }
+    - { path: /var/log/debug, mode: 640, owner: syslog, group: adm, state: touch, recurse: false }
+    - { path: /var/log/iptables.log, mode: 640, owner: syslog, group: adm, state: touch, recurse: false }
+    - { path: /var/log/snmpd.log, mode: 640, owner: syslog, group: adm, state: touch, recurse: false }
+  kernel:
+    - { option: "fs.suid_dumpable", value: 0 }
+    - { option: "kernel.randomize_va_space", value: 2 }
+    - { option: "kernel.core_uses_pid", value: 1 }
+    - { option: "kernel.dmesg_restrict", value: 1 }
+    - { option: "kernel.kptr_restrict", value: 2 }
+    - { option: "kernel.sysrq", value: 0 }
+    - { option: "net.ipv4.ip_forward", value: 0 }
+    - { option: "net.ipv4.conf.all.send_redirects", value: 0 }
+    - { option: "net.ipv4.conf.default.send_redirects", value: 0 }
+    - { option: "net.ipv4.conf.all.accept_source_route", value: 0 }
+    - { option: "net.ipv4.conf.default.accept_source_route", value: 0 }
+    - { option: "net.ipv4.conf.all.accept_redirects", value: 0 }
+    - { option: "net.ipv4.conf.default.accept_redirects", value: 0 }
+    - { option: "net.ipv4.conf.all.log_martians", value: 1 }
+    - { option: "net.ipv4.conf.default.log_martians", value: 1 }
+    - { option: "net.ipv4.icmp_echo_ignore_broadcasts", value: 1 }
+    - { option: "net.ipv4.icmp_ignore_bogus_error_responses", value: 1 }
+    - { option: "net.ipv4.conf.all.rp_filter", value: 1 }
+    - { option: "net.ipv4.conf.default.rp_filter", value: 1 }
+    - { option: "net.ipv4.tcp_syncookies", value: 1 }
+    - { option: "net.ipv4.tcp_max_syn_backlog", value: 4096 }
+    - { option: "net.ipv4.tcp_max_orphans", value: 16384 }
+    - { option: "net.ipv4.ip_local_port_range", value: "1024 65535" }
+    - { option: "net.ipv6.conf.all.accept_redirects", value: 0 }
+    - { option: "net.ipv6.conf.default.accept_redirects", value: 0 } 
+  users:
+    add:
+      - uucp
+    disable:
+    remove:
+      - games
+      - sync
+      - lp
+      - news
+      - proxy
+      - backup
+      - list
+      - irc
+      - gnats
+  user_groups:
+    add:
+      - uucp
+      - wheel
+    remove:
+      - floppy
+      - tape
+      - lp
+      - news
+      - proxy
+      - dialout
+      - fax
+      - voice
+      - audio
+      - backup
+      - operator
+      - list
+      - irc
+      - src
+      - gnats
+      - video
+      - games
+      - fuse
+      - lpadmin
+      - sambashare
+  ssh:
+    config:
+      - { option: "TCPKeepAlive", value: "yes" }
+      - { option: "Protocol", value: "2" }
+      - { option: "LogLevel", value: "INFO" }
+      - { option: "X11Forwarding", value: "no" }
+      - { option: "MaxAuthTries", value: "4" }
+      - { option: "IgnoreRhosts", value: "yes" }
+      - { option: "HostbasedAuthentication", value: "no" }
+      - { option: "PermitRootLogin", value: "no" }
+      - { option: "PermitEmptyPasswords", value: "no" }
+      - { option: "PermitUserEnvironment", value: "no" }
+      - { option: "Ciphers", value: "aes128-ctr,aes192-ctr,aes256-ctr" }
+      - { option: "ClientAliveInterval", value: 300 }
+      - { option: "ClientAliveCountMax", value: 0 }
+      - { option: "LoginGraceTime", value: 60 }
+      - { option: "AllowGroups", value: "sudo" }
+      - { option: "Banner", value: "/etc/issue.net" }
+      - { option: "ServerKeyBits", value: 2048 }
+      - { option: "Port", value: "22" }
+
