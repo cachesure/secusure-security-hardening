@@ -1,0 +1,11 @@
+---
+
+- name: Install Auditd
+  package:
+    name: audit
+    state: present
+
+- name: Enable Auditd Service
+  service:
+    name: auditd
+    state: enabled
