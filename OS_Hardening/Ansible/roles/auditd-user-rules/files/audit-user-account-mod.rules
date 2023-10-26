@@ -1,0 +1,22 @@
+# User is added or modified
+-w /etc/passwd -p wa -k passwd-write
+# User details are read
+-w /etc/passwd -p r -k passwd-read
+# Group is added or modified
+-w /etc/group -p wa -k group-write
+# Group details are read
+-w /etc/group -p r -k group-read
+# Password is changed
+-w /etc/shadow -p wa -k shadow-write
+# Password file is read
+-w /etc/shadow -p r -k shadow-read
+# Sudo access is changed
+-w /etc/sudoers -p wa -k sudoers-write
+# Sudo details are read
+-w /etc/sudoers -p r -k sudoers-read
+# Samba User Credentials added or modified
+-w /var/lib/samba/private/passdb.tdb -p wa -k samba-creds-write
+# Samba User Credentials are read
+-w /var/lib/samba/private/passdb.tdb -p r -k samba-creds-read
+# PAM Authentication Rules are added or modified
+-w /etc/pam.d/ -p wa -k pam-auth-write

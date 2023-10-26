@@ -1,0 +1,14 @@
+---
+
+- name: Configure User Audit Rules
+  copy:
+    src: audit-user-account-mod.rules
+    dest: /etc/audit/rules.d/audit-user-account-mod.rules
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Reload Audit
+  service:
+    name: audit
+    state: reloaded
